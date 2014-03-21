@@ -4,68 +4,385 @@
 // Version     :
 // Copyright   :
 // Description : Read GPS and Wireless information from drivers write it on a file.
+// Depends on  : libiw-dev, libgps-dev
 //============================================================================
 
 #include <iostream>
 #include <libgpsmm.h>
 #include <sys/socket.h>
 #include <iwlib.h>
+#include <pthread.h>
+#include <fstream>
+#include <limits>
+#include<sstream>
 
 using namespace std;
 
-int main() {
+typedef std::numeric_limits< double > dbl;
+//des petits raccourcis :
+#define wi_result context.result
+#define wi_config  context.result->b
+#define wi_stats context.result->stats
+#define csv_na  csv << "\"" << "N/A" << "\", "
+#define csv_add(x) csv << "\"" << x << "\", "
+#define csv_add_final(x) csv << "\"" << x << "\""
 
-	gpsmm gps_rec("localhost", DEFAULT_GPSD_PORT);
+template <typename T>
+string NumbersToString ( T numbers[])
+{
+   int n = sizeof(numbers)/sizeof(numbers[0]);
+    stringstream ss;
+    for (int i = 0; i <=n; i++)
+    {
+        ss << (int)numbers[i];
+        ss << ";";
+    }
+    return ss.str();
+}
 
-	if (gps_rec.stream(WATCH_ENABLE | WATCH_JSON) == NULL) {
-		cerr << "Démarrez GPSD!!!\n";
-		return 1;
-	}
 
-	wireless_scan_head context;
 
-	for (;;) {
+string FreqsToString(iw_freq freq[])
+{
+int n = sizeof(freq)/sizeof(freq[0]);
+    stringstream ss;
+    for (int i = 0; i <=n; i++)
+    {
+        ss << (int)freq[i].m;
+        ss << "e";
+        ss << (int)freq[i].e;
+        ss << ";";
+    }
+    return ss.str();
 
-		//1 - obtenons la donnée gps.
+}
 
-		struct gps_data_t* newdata;
+void* start_GPS_Scan(void*)
+{
+    gpsmm gps_rec("localhost", DEFAULT_GPSD_PORT);
 
-		if (!gps_rec.waiting(50000000))
-			continue;
+    if (gps_rec.stream(WATCH_ENABLE | WATCH_JSON) == NULL)
+    {
+        cerr << "Démarrez GPSD!!!\n";
+        pthread_exit(NULL);
+    }
+    //Préparons le fichier csv.
+    std::ofstream csv;
+    csv.open ("GPSdata.csv",std::ofstream::trunc);
+    csv <<
+    "\"Time\",\"TimeIncert\",\"Latitude\",\"LatUncert\",\"Longitude\",\"LongUncert\","<<
+    "\"Altitude\",\"AltUncert\",\"Course\",\"CourseUncert\",\"GroundSpeed\",\"GroundSpeedUncert\",\"ClimbSpeed\",\"ClimbSpeedIncert\""<<endl;
+    csv.close();
+    for (;;)
+    {
+        //1 - obtenons la donnée gps.
 
-		if ((newdata = gps_rec.read()) == NULL) {
-			cerr << "Erreur de lecture.\n";
-			return 1;
-		} else {
-			cout << newdata->fix.time << " :";
-			cout << newdata->fix.latitude << ", ";
-			cout << newdata->fix.longitude << ", ";
-			cout << newdata->fix.altitude << "M. " << endl;
-		}
+        struct gps_data_t* newdata;
 
-		//2 - scannons les données wifi.
-		int skfd;
-		skfd = iw_sockets_open();
+        if (!gps_rec.waiting(50000000))
+            continue;
 
-		char* interface = "eth1";
-		int ret = iw_scan(skfd, interface, WIRELESS_EXT, &context);
+        if ((newdata = gps_rec.read()) == NULL)
+        {
+            cerr << "Erreur de lecture.\n";
+            pthread_exit(NULL);
+        }
+        else
+        {
 
-		cout << ret;
-		if (ret >= 0) {
-			while (context.result) {
-				if (context.result->b.has_essid && context.result->b.essid_on)
-					cout << "ESSID : " << context.result->b.essid << endl;
-				cout << "Entryption : "
-						<< (context.result->b.has_key ? "on" : "off") << endl;
+            if(newdata->fix.mode>=2)
+            {
+                csv.open ("GPSdata.csv",std::ofstream::app);
+                csv.precision(dbl::digits10);
+                //Time TimeIncert	Latitude LatUncert	Longitude LongUncert	Altitude AltUncert	Course CourseUncert GroundSpeed GroundSpeedUncert	ClimbSpeed	ClimbSpeedIncert
 
-				context.result = context.result->next;
-			}
+                csv_add(newdata->fix.time );			/* Time */
+                csv_add(newdata->fix.ept );		/* Expected time uncertainty */
+                csv_add(newdata->fix.latitude );	/* Latitude in degrees (valid if mode >= 2) */
+                csv_add(newdata->fix.epy );  	/* Latitude position uncertainty, meters */
+                csv_add(newdata->fix.longitude );	/* Longitude in degrees (valid if mode >= 2) */
+                csv_add(newdata->fix.epx );  	/* Longitude position uncertainty, meters */
+                csv_add(newdata->fix.altitude );	/* Altitude in meters (valid if mode == 3) */
+                csv_add(newdata->fix.epv );  	/* Vertical position uncertainty, meters */
+                csv_add(newdata->fix.track );	/* Course made good (relative to true north) */
+                csv_add(newdata->fix.epd );		/* Track uncertainty, degrees */
+                csv_add(newdata->fix.speed );	/* Speed over ground, meters/sec */
+                csv_add(newdata->fix.eps );		/* Speed uncertainty, meters/sec */
+                csv_add(newdata->fix.climb );       /* Vertical speed, meters/sec */
+                csv_add(newdata->fix.epc ) << endl;		/* Vertical speed uncertainty */
+                cout << newdata->fix.latitude<<", "<< newdata->fix.longitude<<endl;
 
-		}
-		iw_sockets_close(skfd);
-		sleep(1);
 
-	}
+                csv.close();
+            }
+        }
 
-	return 0;
+
+    }
+
+
+    pthread_exit(NULL);
+}
+
+
+
+
+void* start_WiFi_Scan(void*)
+{
+
+    wireless_scan_head context;
+    iw_range range;
+
+    //Préparons le fichier csv.
+    std::ofstream csv;
+    csv.open ("WiFiData.csv",std::ofstream::trunc);
+    csv.precision(dbl::digits10);
+
+    csv <<
+    "\"time\",\"time_incert\", \"protocol_name\", \"network_id\", \"freq\", \"freq_flags\", \"Encoding_key\", \"key_size\", \"key_flags\", \"essid_on\", \"essid_name\", \"essid_len\", \"oper_mode\","<<
+    " \"device_dependant_status\", \"link_quality_qual\", \"link_quality_level\", \"link_quality_noise\", \"link_quality_updated\", \"packet_discard_counts_nwid\", \"packet_discard_counts_code\", \"packet_discard_counts_fragment\", \"packet_discard_counts_retries\", \"packet_discard_counts_misc\", \"packet_missed_counts_beacon\""<<endl;
+    csv.close();
+
+
+    csv.open ("WiFiRange.csv",std::ofstream::trunc);
+    csv <<  "\"time\",\"time_incert\",\"range_throughput\", \"range_min_nwid\", \"range_max_nwid\", \"range_old_num_channels\", \"range_old_num_frequency\", \"range_sensitivity\", "
+ << "\"range_avg_quality_qual\", \"range_avg_quality_level\", \"range_avg_quality_noise\", \"range_avg_quality_updated\", "
+ << "\"range_max_quality_qual\", \"range_max_quality_level\", \"range_max_quality_noise\", \"range_max_quality_updated\", "
+ << "\"range_num_bitrates\", \"range_list_bitrates\", \"range_min_rts\", \"range_max_rts\", \"range_min_frag\", \"range_max_frag\", "
+ << "\"range_min_pm_period\", \"range_max_pm_period\", \"range_min_pm_timeout\", \"range_max_pm_timeout\", \"range_pm_period_flags\",\"range_pt_flags\", \"range_pm_capa\", "
+ << "\"range_encoding_size_ls\", renge_num_encoding_size\", \"range_max_encoding_tokens\", \"range_encoding_login_index\", "
+ << "\"range_transmit_power_capa\", \"range_num_transmit_power\", \"range_transmit_power_ls_bps\", "
+ << "\"range_retry_limit_capa\", \"range_retry_limit_flags\", \"range_min_retry\", \"range_max_retry\", \"range_min_retry_lifetime\", \"range_max_retry_lifetime\", "
+ << "\"range_num_channels\", \"range_num_frequency\", \"range_freq_list\", "
+ << "\"range_enc_capa\", \"range_min_pm_saving\", \"range_max_pm_saving\", \"range_pm_saving_flags\", \"range_modul_capa\", "
+ << "\"range_bitrate_capa\"";
+
+
+    csv <<endl;
+    csv.close();
+
+
+    for (;;)
+    {
+
+
+
+
+        //2 - scannons les données wifi.
+        int skfd;
+        skfd = iw_sockets_open();
+
+        char* interface = new char[5];
+        strcpy( interface, "wlan0" );
+        time_t timestamp;
+        time(&timestamp);
+        int now = (int)timestamp;
+        int retScan = iw_scan(skfd, interface, WIRELESS_EXT, &context);
+        int retRange = iw_get_range_info(skfd, interface, &range);
+        iw_sockets_close(skfd);
+
+        if (retScan >= 0)
+        {
+            while (context.result)
+            {
+
+
+
+//time, time_incert, protocol_name, network_id, freq, freq_flags, Encoding_key, key_size, key_flags, essid_on, essid_name, essid_len, oper_mode,
+//device_dependant_status, link_quality_qual, link_quality_level, link_quality_noise, link_quality_updated, packet_discard_counts_nwid, packet_discard_counts_code, packet_discard_counts_fragment, packet_discard_counts_retries, packet_discard_counts_misc, packet_missed_counts_beacon,
+
+
+
+                csv.open ("WiFiData.csv",std::ofstream::app);
+                csv.precision(dbl::digits10);
+
+                csv_add(now   );  //time
+                csv_add("0.5"  );  //time_incert
+                csv_add(wi_config.name   );  //protocol_name
+                if(wi_config.has_nwid)
+                {
+                    csv_add((int)wi_config.nwid.value );  //network_id
+
+                    cout << "network id : " << (int)wi_config.nwid.value << endl;
+                }
+                else csv_na;
+
+                if(wi_config.has_freq)
+                {
+                    csv_add(wi_config.freq   );  //freq
+                    csv_add(wi_config.freq_flags   );  //freq_flags
+                }
+                else
+                {
+                    csv_na;
+                    csv_na;
+                }
+                if(wi_config.has_key)
+                {
+                    csv_add(wi_config.key   );  //Encoding_key
+                    csv_add(wi_config.key_size   );  //key_size
+                    csv_add(wi_config.key_flags   );  //key_flags
+                }
+                else
+                {
+                    csv_na;
+                    csv_na;
+                    csv_na;
+                }
+                if(wi_config.has_essid)
+                {
+                    csv_add((wi_config.essid_on?"ON":"OFF")  );  //essid_on
+                }
+                else
+                    csv_na;
+
+                if(wi_config.has_essid && wi_config.essid_on)
+                {
+
+                    csv_add(wi_config.essid   );  //essid_name
+                    csv_add(wi_config.essid_len   );  //essid_len
+
+                    cout << "essid : " << wi_config.essid << endl;
+                }
+                else
+                {
+                    csv_na;
+                    csv_na;
+                }
+
+                if(wi_config.has_mode)
+                {
+                    csv_add(wi_config.mode   );  //oper_mode,
+
+                }
+                else
+                {
+                    csv_na;
+                }
+
+
+                if(context.result->has_stats)
+                {
+
+                    csv_add( (int)wi_stats.status  );  //device_dependant_status
+                    csv_add( (int)wi_stats.qual.qual  );  //link_quality_qual
+                    csv_add( (int)wi_stats.qual.level  );  //link_quality_level
+                    csv_add( (int)wi_stats.qual.noise  );  //link_quality_noise
+                    csv_add( (int)wi_stats.qual.updated  );  //link_quality_updated
+                    csv_add( (int)wi_stats.discard.nwid  );  //packet_discard_counts_nwid
+                    csv_add( (int)wi_stats.discard.code  );  //packet_discard_counts_code
+                    csv_add( (int)wi_stats.discard.fragment  );  //packet_discard_counts_fragment
+                    csv_add( (int)wi_stats.discard.retries  );  //packet_discard_counts_retries
+                    csv_add( (int)wi_stats.discard.misc  );  //packet_discard_counts_misc
+                    csv_add_final( (int)wi_stats.miss.beacon  );  //packet_missed_counts_beacon
+
+
+                         }
+                         else
+                {
+                    csv  << "\"\" , \"\" , \"\" , \"\" , \"\" , \"\" , \"\" , \"\" , \"\" , \"\" , \"\"";  //link_quality_qual
+
+                }
+                csv<<endl;
+                csv.close();
+                context.result = context.result->next;
+            }
+
+
+        }
+
+
+        if (retRange >= 0)
+        {
+
+            csv.open ("WiFiRange.csv",std::ofstream::app);
+
+            csv_add(now   );  //time
+            csv_add(""  );  //time_incert
+
+            csv_add((int)range.throughput  );//range_throughput
+            csv_add((int)range.min_nwid  );//range_min_nwid
+            csv_add((int)range.max_nwid  );//range_max_nwid
+            csv_add((int)range.old_num_channels  );//range_old_num_channels
+            csv_add((int)range.old_num_frequency  );//range_old_num_frequency
+            csv_add((int)range.sensitivity  );//range_sensitivity,
+            csv_add((int)range.avg_qual.qual  );//range_avg_quality_qual
+            csv_add((int)range.avg_qual.level  );//range_avg_quality_level
+            csv_add((int)range.avg_qual.noise  );//range_avg_quality_noise
+            csv_add((int)range.avg_qual.updated  );//range_avg_quality_updated,
+            csv_add((int)range.max_qual.qual  );//range_max_quality_qual
+            csv_add((int)range.max_qual.level  );//range_max_quality_level
+            csv_add((int)range.max_qual.noise  );//range_max_quality_noise
+            csv_add((int)range.max_qual.updated  );//range_max_quality_updated,
+            csv_add((int)range.num_bitrates  );//range_num_bitrates
+            csv_add(NumbersToString(range.bitrate ) );//range_list_bitrates
+            csv_add((int)range.min_rts  );//range_min_rts
+            csv_add((int)range.max_rts  );//range_max_rts
+            csv_add((int)range.min_frag  );//range_min_frag,
+            csv_add((int)range.max_frag  );//range_min_frag,
+            csv_add((int)range.min_pmp  );//range_min_pm_period
+            csv_add((int)range.max_pmp  );//range_max_pm_period
+            csv_add((int)range.min_pmt  );//range_min_pm_timeout
+            csv_add((int)range.max_pmt  );//range_max_pm_timeout
+            csv_add((int)range.pmp_flags  );//range_pm_period_flags
+            csv_add((int)range.pmt_flags  );//range_pm_timeout_flags
+            csv_add((int)range.pm_capa  );//range_pm_capa
+            csv_add(NumbersToString(range.encoding_size)  );//range_encoding_size_ls
+            csv_add((int)range.num_encoding_sizes  );//renge_num_encoding_size
+            csv_add((int)range.max_encoding_tokens  );//range_max_encoding_tokens
+            csv_add((int)range.encoding_login_index  );//range_encoding_login_index,
+            csv_add((int)range.txpower_capa  );//range_transmit_power_capa
+            csv_add((int)range.num_txpower  );//range_num_transmit_power
+            csv_add(NumbersToString(range.txpower)  );//range_transmit_power_ls_bps,
+            csv_add((int)range.retry_capa  );//range_retry_limit_capa
+            csv_add((int)range.retry_flags  );//range_retry_limit_flags
+            csv_add((int)range.min_retry  );//range_min_retry
+            csv_add((int)range.max_retry  );//range_max_retry
+            csv_add((int)range.min_r_time  );//range_min_retry_lifetime
+            csv_add((int)range.max_r_time  ); //range_max_retry_lifetime
+            csv_add((int)range.num_channels  );//range_num_channels
+            csv_add((int)range.num_frequency  );//range_num_frequency
+            csv_add(FreqsToString(range.freq)  );//range_freq_list
+            csv_add((int)range.enc_capa  );//range_enc_capa
+            csv_add((int)range.min_pms  );//range_min_pm_saving
+            csv_add((int)range.max_pms  );//range_max_pm_saving
+            csv_add((int)range.pms_flags  );//range_pm_saving_flags
+            csv_add((int)range.modul_capa  );//range_modul_capa
+            csv_add_final((int)range.bitrate_capa  ) << endl;//range_bitrate_capa
+            csv.close();
+
+        }
+
+
+
+        //sleep(1);
+
+    }
+    pthread_exit(NULL);
+}
+
+
+
+int main()
+{
+
+    //2 threads concurrents
+
+    pthread_t thread_GPS;
+    pthread_t thread_WiFi;
+    pthread_attr_t attribut;
+    void *etat;
+    pthread_attr_init(&attribut);
+    pthread_attr_setdetachstate(&attribut, PTHREAD_CREATE_JOINABLE);
+
+
+    pthread_create(&thread_GPS, NULL, start_GPS_Scan, NULL);
+    pthread_create(&thread_WiFi, NULL, start_WiFi_Scan, NULL);
+
+    pthread_attr_destroy(&attribut);
+
+    pthread_join(thread_GPS, &etat);
+    pthread_join(thread_WiFi, &etat);
+
+    pthread_exit(NULL);
 }
