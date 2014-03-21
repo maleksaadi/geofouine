@@ -136,8 +136,6 @@ void* start_WiFi_Scan(void*)
     //Préparons le fichier csv.
     std::ofstream csv;
     csv.open ("WiFiData.csv",std::ofstream::trunc);
-    csv.precision(dbl::digits10);
-
     csv <<
     "\"time\",\"time_incert\", \"protocol_name\", \"network_id\", \"freq\", \"freq_flags\", \"Encoding_key\", \"key_size\", \"key_flags\", \"essid_on\", \"essid_name\", \"essid_len\", \"oper_mode\","<<
     " \"device_dependant_status\", \"link_quality_qual\", \"link_quality_level\", \"link_quality_noise\", \"link_quality_updated\", \"packet_discard_counts_nwid\", \"packet_discard_counts_code\", \"packet_discard_counts_fragment\", \"packet_discard_counts_retries\", \"packet_discard_counts_misc\", \"packet_missed_counts_beacon\""<<endl;
