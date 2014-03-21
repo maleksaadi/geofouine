@@ -28,7 +28,7 @@ typedef std::numeric_limits< double > dbl;
 #define csv_add_final(x) csv << "\"" << x << "\""
 
 template <typename T>
-string NumbersToString ( T numbers[])
+string convert_intarray_string ( T numbers[])
 {
    int n = sizeof(numbers)/sizeof(numbers[0]);
     stringstream ss;
@@ -42,7 +42,7 @@ string NumbersToString ( T numbers[])
 
 
 
-string FreqsToString(iw_freq freq[])
+string convert_freqarray_string(iw_freq freq[])
 {
 int n = sizeof(freq)/sizeof(freq[0]);
     stringstream ss;
@@ -315,7 +315,7 @@ void* start_WiFi_Scan(void*)
             csv_add((int)range.max_qual.noise  );//range_max_quality_noise
             csv_add((int)range.max_qual.updated  );//range_max_quality_updated,
             csv_add((int)range.num_bitrates  );//range_num_bitrates
-            csv_add(NumbersToString(range.bitrate ) );//range_list_bitrates
+            csv_add(convert_intarray_string(range.bitrate ) );//range_list_bitrates
             csv_add((int)range.min_rts  );//range_min_rts
             csv_add((int)range.max_rts  );//range_max_rts
             csv_add((int)range.min_frag  );//range_min_frag,
@@ -327,13 +327,13 @@ void* start_WiFi_Scan(void*)
             csv_add((int)range.pmp_flags  );//range_pm_period_flags
             csv_add((int)range.pmt_flags  );//range_pm_timeout_flags
             csv_add((int)range.pm_capa  );//range_pm_capa
-            csv_add(NumbersToString(range.encoding_size)  );//range_encoding_size_ls
+            csv_add(convert_intarray_string(range.encoding_size)  );//range_encoding_size_ls
             csv_add((int)range.num_encoding_sizes  );//renge_num_encoding_size
             csv_add((int)range.max_encoding_tokens  );//range_max_encoding_tokens
             csv_add((int)range.encoding_login_index  );//range_encoding_login_index,
             csv_add((int)range.txpower_capa  );//range_transmit_power_capa
             csv_add((int)range.num_txpower  );//range_num_transmit_power
-            csv_add(NumbersToString(range.txpower)  );//range_transmit_power_ls_bps,
+            csv_add(convert_intarray_string(range.txpower)  );//range_transmit_power_ls_bps,
             csv_add((int)range.retry_capa  );//range_retry_limit_capa
             csv_add((int)range.retry_flags  );//range_retry_limit_flags
             csv_add((int)range.min_retry  );//range_min_retry
@@ -342,7 +342,7 @@ void* start_WiFi_Scan(void*)
             csv_add((int)range.max_r_time  ); //range_max_retry_lifetime
             csv_add((int)range.num_channels  );//range_num_channels
             csv_add((int)range.num_frequency  );//range_num_frequency
-            csv_add(FreqsToString(range.freq)  );//range_freq_list
+            csv_add(convert_freqarray_string(range.freq)  );//range_freq_list
             csv_add((int)range.enc_capa  );//range_enc_capa
             csv_add((int)range.min_pms  );//range_min_pm_saving
             csv_add((int)range.max_pms  );//range_max_pm_saving
@@ -365,8 +365,6 @@ void* start_WiFi_Scan(void*)
 
 int main()
 {
-
-    //2 threads concurrents
 
     pthread_t thread_GPS;
     pthread_t thread_WiFi;
