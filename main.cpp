@@ -70,8 +70,8 @@ void* start_GPS_Scan(void*)
     std::ofstream csv;
     csv.open ("GPSdata.csv",std::ofstream::trunc);
     csv <<
-    "\"Time\",\"TimeIncert\",\"Latitude\",\"LatUncert\",\"Longitude\",\"LongUncert\","<<
-    "\"Altitude\",\"AltUncert\",\"Course\",\"CourseUncert\",\"GroundSpeed\",\"GroundSpeedUncert\",\"ClimbSpeed\",\"ClimbSpeedIncert\""<<endl;
+    "\"time\",\"time_incert\",\"latitude\",\"lat_uncert\",\"longitude\",\"long_uncert\","<<
+    "\"altitude\",\"alt_uncert\",\"course\",\"course_uncert\",\"ground_speed\",\"ground_speed_uncert\",\"climb_speed\",\"climb_speed_incert\""<<endl;
     csv.close();
     for (;;)
     {
@@ -109,7 +109,7 @@ void* start_GPS_Scan(void*)
                 csv_add(newdata->fix.speed );	/* Speed over ground, meters/sec */
                 csv_add(newdata->fix.eps );		/* Speed uncertainty, meters/sec */
                 csv_add(newdata->fix.climb );       /* Vertical speed, meters/sec */
-                csv_add(newdata->fix.epc ) << endl;		/* Vertical speed uncertainty */
+                csv_add_final(newdata->fix.epc ) << endl;		/* Vertical speed uncertainty */
                 cout << newdata->fix.latitude<<", "<< newdata->fix.longitude<<endl;
 
 
@@ -197,7 +197,7 @@ void* start_WiFi_Scan(void*)
                 csv.precision(dbl::digits10);
 
                 csv_add(now   );  //time
-                csv_add("0.5"  );  //time_incert
+                csv_add(""  );  //time_incert
                 csv_add(wi_config.name   );  //protocol_name
                 if(wi_config.has_nwid)
                 {
