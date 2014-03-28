@@ -1,0 +1,23 @@
+#!/usr/bin/env bash
+
+
+# checks if reasonable match
+# are found
+
+bad=0
+for lib in $*
+do
+    libname=${lib##-l}
+    re="\(.*/\)*"$libname"\.\(.*\)"
+    found=$(locate $libname | grep -e $re)
+
+    if [ ${#found} == 0 ]
+    then
+        bad=1
+        echo "Missing:" $libname
+    #else
+    #    echo "OK     :" $libname
+    fi
+done
+
+exit $bad
