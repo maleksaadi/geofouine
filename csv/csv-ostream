@@ -1,0 +1,124 @@
+#ifndef __MODULE_CSV_OSTREAM__
+#define __MODULE_CSV_OSTREAM__
+
+#include <iostream>
+#include <string>
+
+namespace csv 
+ {
+
+class csv_ostream //: public std::ostream
+{
+ private:
+
+     std::ostream & out;
+     bool first;
+
+     // this function prints a comma unless
+     // it's the first fields since last std::endl
+     void comma()
+      {
+       if (!first) out << ',';
+       first=false;
+      }
+
+     // this function wraps strings according
+     // to CSV escape mechanisms.
+     std::string csv_quote(const std::string & to_quote)
+      {
+       bool has_comma=false;
+       std::string quoted;
+       for (char c : to_quote)
+        {
+         has_comma |= (c==',');
+         if (c=='\"')
+          quoted.append("\"\""); // ""
+         else
+          quoted.push_back(c);
+        }
+        
+       return 
+        has_comma ? "\""+quoted+"\"" : quoted;
+      }
+
+ public:
+
+     ////////////////////////////
+     // Ends the CSV line (and syncs
+     // streams)
+     void flush()
+      {
+       out.flush();
+       first=true;
+      }
+
+    /////////////////////////////////////
+    // for everything that is not a string,
+    // we can use the default operator<<
+    template <typename T>
+    inline csv_ostream & operator<<( const T & t )
+     {
+      comma();
+      //(*(std::ostream*)this) << t;
+      out << t;
+      return *this;
+     }
+
+    /////////////////////////////////////
+    inline csv_ostream & operator<<(const std::string & s)
+     {
+      comma(); 
+      out << csv_quote(s);
+      return *this;
+     }
+
+    /////////////////////////////////////
+    inline csv_ostream & operator<<(const char * s)
+     {
+      comma(); 
+      out << csv_quote(s);
+      return *this;
+     }
+
+    /////////////////////////////////////
+    // this one is needed to get std::endl
+    // to work properly (without making it
+    // friend)
+    void put(char x) { out << x; }
+
+
+ // the ctor binds the CSV stream
+ // over some kind of ostream (so
+ // it also works for files and pipes)
+ csv_ostream (std::ostream & csv_stream )
+   : out(csv_stream),first(true)
+  {}
+
+ virtual ~csv_ostream() { flush(); }
+
+
+ // these are stub definitions for
+ // iomanip-like operators (such as
+ // std::endl)
+ typedef csv_ostream & (*csv_ostream_manip)(csv_ostream &);
+ csv_ostream & operator<<(csv_ostream_manip manip) { return manip(*this); }
+};
+
+} // namespace csv
+
+////////////////////////////////////////
+//
+// Overloads endl for csv_ostream
+//
+namespace std
+ {
+  inline csv::csv_ostream & endl(csv::csv_ostream & out)
+  {
+   out.put('\n');
+   out.flush();
+   return out;
+  }
+} // namespace std
+
+#endif
+  // __MODULE_CSV_OSTREAM__
