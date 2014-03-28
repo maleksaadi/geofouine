@@ -1,0 +1,19 @@
+#ifndef __MODULE__UTILS__
+#define __MODULE__UTILS__
+
+#include <stdint.h>
+#include <string>
+
+namespace utils
+{
+ namespace ts
+  {
+   uint64_t now();
+   std::string now_s();
+  }
+
+} // namespace utils
+
+
+#endif
+ // __MODULE_UTILS__
