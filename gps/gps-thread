@@ -33,6 +33,10 @@ class gps_worker
         std::cout << "yay?" << std::endl;
         //if(data->fix.mode>=2)
         out << utils::ts::now_s()
+            << data->status
+            << data->satellites_used
+            << data->satellites_visible
+            << data->fix.mode      //
             << data->fix.time      // Time
             << data->fix.ept       // Expected time uncertainty
             << data->fix.latitude  // Latitude in degrees (valid if mode >= 2)

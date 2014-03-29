@@ -1,5 +1,6 @@
 
 SOURCES = \
+	utils/utils.cpp \
 	geofouine.cpp
 
 INCLUDES= -I. -I /usr/include/boost/
@@ -16,6 +17,7 @@ CFLAGS = -O3 \
 LFLAGS = -L/usr/lib/
 
 LIBS  = -lboost_program_options \
+	-lboost_system \
 	-lcrypto \
 	-lgps \
 	-liw

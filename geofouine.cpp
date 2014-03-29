@@ -16,6 +16,9 @@
 #include <limits>
 #include<sstream>
 
+#include <gps/gps-stream>
+#include <gps/gps-thread>
+
 using namespace std;
 
 typedef std::numeric_limits< double > dbl;
@@ -363,7 +366,23 @@ void* start_WiFi_Scan(void*)
 
 int main()
 {
+ //gps_worker * this_worker = new gps_worker(std::cout);
 
+ //this_worker->run();
+  gps::gps_stream * this_gps_stream = new gps::gps_stream("/dev/ttyACM0");
+
+  this_gps_stream->set_update_rate(gps::gps_stream::update_250ms);
+  while (true)
+   std::cout 
+    << utils::ts::now_s()
+    << "\t" 
+    << this_gps_stream->read()
+    << std::endl;
+
+  delete this_gps_stream;
+
+  return 0;
+ /*
     pthread_t thread_GPS;
     pthread_t thread_WiFi;
     pthread_attr_t attribut;
@@ -381,4 +400,5 @@ int main()
     pthread_join(thread_WiFi, &etat);
 
     pthread_exit(NULL);
+*/
 }
