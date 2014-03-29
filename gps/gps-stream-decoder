@@ -1,0 +1,14 @@
+#ifndef __MODULE_GPS_STREAM_DECODER__
+#define __MODULE_GPS_STREAM_DECODER__
+
+#include <string>
+#include <gps/gps-data>
+
+class gps_stream_decoder
+ {
+  public:
+  static gps::gps_data * decode(const std::string & gps_sentence);
+ };
+
+#endif
+  // __MODULE_GPS_STREAM_DECODER__

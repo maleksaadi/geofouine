@@ -1,0 +1,91 @@
+#ifndef __MODULE_GPS_DATA__
+#define __MODULE_GPS_DATA__
+
+#include <string>
+#include <vector>
+#include <boost/algorithm/string.hpp>
+#include <gps/gps-utils>
+
+namespace gps {
+// base class for gps-decoded data
+// (such as lists of satellites, etc.)
+class gps_data
+{
+ protected:
+ 
+ public:
+ 
+ virtual ~gps_data() {}
+};
+
+//////////////////////////////
+class gps_data_unsupported : public gps_data
+ {
+ public:
+  const std::string sentence;
+
+  gps_data_unsupported(const std::string & sentence_)
+   : sentence(sentence_)
+  {}
+
+  virtual ~gps_data_unsupported(){}
+ };
+
+//////////////////////////////
+class gps_data_position : public gps_data
+ {
+  public:
+
+    bool active;
+    struct timeval when;
+    std::pair<float,char> latitude,longitude,variation;
+    float speed,bearing;
+    int fix_type;
+    int nb_satellites;
+
+  gps_data_position(const std::string & sentence)
+  {
+   std::vector<std::string> pieces;
+   boost::algorithm::split(pieces,sentence,boost::algorithm::is_any_of(",*"));
+   
+   active=(pieces[2]=="A");
+   latitude=std::pair<float,char>(std::stof(pieces[3]),pieces[4][0]);
+   longitude=std::pair<float,char>(std::stof(pieces[5]),pieces[6][0]);
+   speed=pieces[6]!="" ? std::stof(pieces[7]):-1;
+   bearing=pieces[7]!="" ? std::stof(pieces[8]):-1;
+   when=gps::gps_time(pieces[9],pieces[1]);
+   if (pieces[10]!="")
+    variation=std::pair<float,char>(std::stof(pieces[10]),pieces[11][0]);
+   else
+    variation=std::pair<float,char>(0,0);
+  }
+
+  virtual ~gps_data_position() {}
+ };
+
+//////////////////////////////
+class gps_data_fix : public gps_data
+ {
+ public:
+  gps_data_fix(const std::string & sentence)
+  {}
+
+  virtual ~gps_data_fix() {}
+ };
+
+//////////////////////////////
+class gps_data_satellites : public gps_data
+ {
+ public:
+
+  gps_data_satellites(const std::string & sentence)
+  {}
+
+  virtual ~gps_data_satellites() {}
+ };
+
+} // namespace GPS
+
+#endif
+ // __MODULE_GPS_DATA__
+
