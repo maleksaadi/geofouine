@@ -13,34 +13,31 @@ namespace gps {
 
 class gps_stream
  {
- private:
+  private:
 
-    boost::asio::io_service io;
-    boost::asio::serial_port serial;
+      boost::asio::io_service io;
+      boost::asio::serial_port serial;
+      std::string buffer;
 
-  std::string buffer;
+  public:
 
- public:
+   typedef
+   enum { update_2000ms,
+          update_1500ms,
+          update_1000ms,
+          update_750ms,
+          update_500ms,
+          update_250ms,
+          update_200ms,
+          update_100ms } gps_update_rate;
 
-  typedef
-  enum { update_2000ms,
-         update_1500ms,
-         update_1000ms,
-         update_750ms,
-         update_500ms,
-         update_250ms,
-         update_200ms,
-         update_100ms } gps_update_rate;
-
-  // returns one complete NMEA line
+  ////////////////////////////
+  //
+  // Reads from the GPS but reassembles
+  // a line that ends in \r\n
+  // 
   std::string read()
   {
-   /*
-   char data[128];
-   size_t r=serial.read_some(boost::asio::buffer(data,128));
-
-   return data;
-   */
    std::string t;
    bool found=false;
    do
@@ -56,7 +53,7 @@ class gps_stream
      if (offset!=std::string::npos) 
       {
        t=buffer.substr(0,offset-1); // skips \r\n
-       buffer.erase(0,offset+1);
+       buffer.erase(0,offset+1); // erases upto \r\n
        found=true;
       }
     } while (!found);
@@ -64,6 +61,10 @@ class gps_stream
    return t;
   }
 
+  ////////////////////////////
+  //
+  // writes a command to the GPS
+  //
   void write(std::string command)
    {
     while (command.length())
@@ -74,33 +75,28 @@ class gps_stream
      }
    }
 
+  ////////////////////////////
+  //
+  // adjusts GPS update rate
+  // with the help of : http://www.hhhh.org/wiml/proj/nmeaxor.html
+  // for checksums
+  //
   void set_update_rate( gps_update_rate rate)
    {
-    // configure GPS options
-    //
-    // with the help of : http://www.hhhh.org/wiml/proj/nmeaxor.html
-    //
     switch (rate)
      {
-    // 2000 ms = $PMTK220,2000*1C
-    // 1500 ms = $PMTK220,1500*1A
-    // 1000 ms = $PMTK220,1000*1F
-    //  750 ms = $PMTK220,750*2C
-    //  500 ms = $PMTK220,500*2B
-    //  250 ms = $PMTK220,250*29
-    //  200 ms = $PMTK220,200*2Ct
-    //  100 ms = $PMTK220,100*2F
-     case update_2000ms: write("$PMTK220,2000*1C\r\n"); break;
-     case update_1500ms: write("$PMTK220,1500*1A\r\n"); break;
-     default:
-     case update_1000ms: write("$PMTK220,1000*1F\r\n"); break;
-     case update_750ms: write("$PMTK220,750*2C\r\n"); break;
-     case update_500ms: write("$PMTK220,500*2B\r\n"); break;
-     case update_250ms: write("$PMTK220,250*29\r\n"); break;
-     case update_200ms: write("$PMTK220,200*2C\r\n"); break;
-     case update_100ms: write("$PMTK220,100*2F\r\n"); break;
+      case update_2000ms: write("$PMTK220,2000*1C\r\n"); break;
+      case update_1500ms: write("$PMTK220,1500*1A\r\n"); break;
+      case update_1000ms: write("$PMTK220,1000*1F\r\n"); break;
+      case update_750ms: write("$PMTK220,750*2C\r\n"); break;
+      case update_500ms: write("$PMTK220,500*2B\r\n"); break;
+      case update_250ms: write("$PMTK220,250*29\r\n"); break;
+      case update_200ms: write("$PMTK220,200*2C\r\n"); break;
+      case update_100ms: write("$PMTK220,100*2F\r\n"); break;
+      default:
+       throw std::invalid_argument("gps_stream: invalid update rate");
+       break;
      }
-     
    }
 
   gps_stream( const std::string & terminal,
