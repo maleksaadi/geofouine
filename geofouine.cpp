@@ -7,7 +7,9 @@
 // Depends on  : libiw-dev, libgps-dev
 //============================================================================
 
+#include <time.h>
 #include <iostream>
+#include <iomanip>
 #include <libgpsmm.h>
 #include <sys/socket.h>
 #include <iwlib.h>
@@ -17,6 +19,8 @@
 #include<sstream>
 
 #include <gps/gps-stream>
+#include <gps/gps-stream-decoder>
+#include <gps/gps-data>
 #include <gps/gps-thread>
 
 using namespace std;
@@ -373,11 +377,33 @@ int main()
 
   this_gps_stream->set_update_rate(gps::gps_stream::update_250ms);
   while (true)
-   std::cout 
-    << utils::ts::now_s()
-    << "\t" 
-    << this_gps_stream->read()
-    << std::endl;
+   {
+    string t= this_gps_stream->read();
+    std::cout 
+     << utils::ts::now_s()
+     << "\t" 
+     << t
+     << std::endl;
+    
+    gps::gps_data * data = gps_stream_decoder::decode(t);
+
+    std::cout << typeid(*data).name() << std::endl;
+    
+    if (typeid(*data)==typeid(gps::gps_data_position))
+     {
+      gps::gps_data_position * t=(gps::gps_data_position*)data;
+      std::cout 
+       << "{" << ctime(&t->when.tv_sec) << "." << std::setw(6) << t->when.tv_usec << "} "
+       << t->latitude.first << ' '
+       << t->latitude.second 
+       << ","
+       << t->longitude.first << ' '
+       << t->longitude.second
+       << std::endl;
+     }
+
+    delete data;
+   }
 
   delete this_gps_stream;
 

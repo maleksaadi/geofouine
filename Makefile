@@ -1,6 +1,8 @@
 
 SOURCES = \
 	utils/utils.cpp \
+	gps/gps-utils.cpp \
+	gps/gps-stream-decoder.cpp \
 	geofouine.cpp
 
 INCLUDES= -I. -I /usr/include/boost/
