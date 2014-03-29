@@ -115,6 +115,27 @@ class gps_stream
       serial.set_option(boost::asio::serial_port_base::character_size(bits));
       serial.set_option(boost::asio::serial_port_base::parity(parity));
       serial.set_option(boost::asio::serial_port_base::stop_bits(stop_bits));
+
+      // get GPS to output all NMEA standard fields,
+      // with different update rates
+      //  0 NMEA_SEN_GLL, // GPGLL interval - Geographic Position - Latitude longitude
+      //  1 NMEA_SEN_RMC, // GPRMC interval - Recommended Minimum Specific GNSS Sentence
+      //  2 NMEA_SEN_VTG, // GPVTG interval - CourseOver Ground and Ground Speed
+      //  3 NMEA_SEN_GGA, // GPGGA interval - GPS Fix Data
+      //  4 NMEA_SEN_GSA, // GPGSA interval - GNSS DOPS and Active Satellites
+      //  5 NMEA_SEN_GSV, // GPGSV interval - GNSS Satellites in View
+      //  6 NMEA_SEN_GRS, // GPGRS interval - GNSS Range Residuals
+      //  7 NMEA_SEN_GST, // GPGST interval - GNSS Pseudorange Errors Statistics
+      //  8 ?
+      //  9 ?
+      // 10 ?
+      // 11 ?
+      // 12 ?
+      // 13 NMEA_SEN_MALM, // PMTKALM interval - GPS almanac information
+      // 14 NMEA_SEN_MEPH, // PMTKEPH interval - GPS ephmeris information
+      // 15 NMEA_SEN_MDGP, // PMTKDGP interval - GPS differential correction information
+      // 16 NMEA_SEN_MDBG, // PMTKDBG interval – MTK debug information 
+      write("$PMTK514,1,1,1,1,1,5,1,1,1,1,1,1,0,1,1,1,1*2A<\r\n");
      }
     else
      throw std::runtime_error("gps_stream: cannot open "+terminal);
