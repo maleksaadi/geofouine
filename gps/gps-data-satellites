@@ -4,10 +4,41 @@
 //////////////////////////////
 class gps_data_satellites : public gps_data
  {
- public:
+  public:
+
+      typedef
+       struct 
+        {
+         int prn,elevation,azimuth,snr;
+        } satellite_info;
+
+      struct timeval when;
+      int part_nb,nb_parts;
+      int nb_satellites; // for this *group* of messages
+      std::vector<satellite_info> satellites;
 
   gps_data_satellites(const std::string & sentence)
-  {}
+   {
+    std::vector<std::string> pieces;
+    boost::algorithm::split(pieces,sentence,boost::algorithm::is_any_of(",*"));
+    
+    when=utils::ts::now();
+    nb_parts=std::stoi(pieces[1]);
+    part_nb=std::stoi(pieces[2]);
+    nb_satellites=std::stoi(pieces[3]); // for this *group* of messages
+    
+    int sat=pieces.size()-4-1; // -4 = first 4 ones, -1 = last one is checksum
+    for (int i=0;i<sat/4;i++)
+     {
+      satellite_info t=
+       { pieces[4+i*4+0]=="" ? 0 : std::stoi(pieces[4+i*4+0]), // prn
+         pieces[4+i*4+1]=="" ? 0 : std::stoi(pieces[4+i*4+1]), // elevation
+         pieces[4+i*4+2]=="" ? 0 : std::stoi(pieces[4+i*4+2]), // azimuth
+         pieces[4+i*4+3]=="" ? 0 : std::stoi(pieces[4+i*4+3]) // psnr
+       };
+      satellites.push_back(t);
+     }
+   }
 
   virtual ~gps_data_satellites() {}
  };

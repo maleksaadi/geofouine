@@ -443,6 +443,26 @@ int main()
        << std::endl;
      }
 
+    if (typeid(*data)==typeid(gps::gps_data_satellites))
+     {
+      gps::gps_data_satellites *t=(gps::gps_data_satellites*)data;
+      std::cout
+       << "{ " << utils::time::time_s(t->when) << "} "
+       << "GSV "
+       << t->part_nb << "/" << t->nb_parts
+       << " nb=" << t->nb_satellites
+       << "\t";
+      for(auto x : t->satellites)
+       std::cout 
+        << " [" << x.prn 
+        << "," << x.elevation 
+        << "," << x.azimuth 
+        << "," << x.snr 
+        << "]";
+      std::cout << std::endl;
+      
+     }
+
     delete data;
    }
 
