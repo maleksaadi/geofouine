@@ -435,6 +435,11 @@ int main()
        << ","
        << t->longitude.first << ' '
        << t->longitude.second
+       << " fix Q=" << t->fix_quality
+       << " nb sat=" << t->nb_satellites_tracked
+       << " hdop=" << t->horizontal_dilution_of_precision
+       << " alt=" << t->altitude
+       << " geo=" << t->geoid_altitude
        << std::endl;
      }
 

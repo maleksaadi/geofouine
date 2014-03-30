@@ -24,11 +24,19 @@ class gps_data_fix : public gps_data
     std::vector<std::string> pieces;
     boost::algorithm::split(pieces,sentence,boost::algorithm::is_any_of(",*"));
     
+    // patch date+time with UTC "today" date.
     when=gps::gps_time(gps::gps_utc_date_s(utils::ts::now()),pieces[1]);
 
     latitude=std::pair<float,char>(std::stof(pieces[2]),pieces[3][0]);
     longitude=std::pair<float,char>(std::stof(pieces[4]),pieces[5][0]);
-
+    fix_quality=std::stoi(pieces[6]);
+    nb_satellites_tracked=std::stoi(pieces[7]);
+    horizontal_dilution_of_precision=std::stof(pieces[8]);
+    altitude=std::stof(pieces[9]);
+    if (pieces[11]!="")
+     geoid_altitude=std::stof(pieces[11]);
+    else
+     geoid_altitude=0;
    }
 
   virtual ~gps_data_fix() {}
