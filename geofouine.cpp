@@ -106,11 +106,11 @@ void* start_GPS_Scan(void*)
                 csv_add(newdata->fix.time );			/* Time */
                 csv_add(newdata->fix.ept );		/* Expected time uncertainty */
                 csv_add(newdata->fix.latitude );	/* Latitude in degrees (valid if mode >= 2) */
-                csv_add(newdata->fix.epy );  	/* Latitude position uncertainty, meters */
+                csv_add(newdata->fix.epy );     /* Latitude position uncertainty, meters */
                 csv_add(newdata->fix.longitude );	/* Longitude in degrees (valid if mode >= 2) */
-                csv_add(newdata->fix.epx );  	/* Longitude position uncertainty, meters */
+                csv_add(newdata->fix.epx );     /* Longitude position uncertainty, meters */
                 csv_add(newdata->fix.altitude );	/* Altitude in meters (valid if mode == 3) */
-                csv_add(newdata->fix.epv );  	/* Vertical position uncertainty, meters */
+                csv_add(newdata->fix.epv );     /* Vertical position uncertainty, meters */
                 csv_add(newdata->fix.track );	/* Course made good (relative to true north) */
                 csv_add(newdata->fix.epd );		/* Track uncertainty, degrees */
                 csv_add(newdata->fix.speed );	/* Speed over ground, meters/sec */
@@ -379,23 +379,59 @@ int main()
   while (true)
    {
     string t= this_gps_stream->read();
-    std::cout 
-     << utils::ts::now_s()
-     << "\t" 
+    std::cout
+     << utils::time::time_s(utils::ts::now())
+     << "\t"
+     << utils::time::utc_time_s(utils::ts::now())
+     << "\t"
      << t
      << std::endl;
-    
-    gps::gps_data * data = gps_stream_decoder::decode(t);
+
+    gps::gps_data * data = gps::gps_stream_decoder::decode(t);
 
     std::cout << typeid(*data).name() << std::endl;
-    
+
     if (typeid(*data)==typeid(gps::gps_data_position))
      {
       gps::gps_data_position * t=(gps::gps_data_position*)data;
-      std::cout 
-       << "{" << ctime(&t->when.tv_sec) << "." << std::setw(6) << t->when.tv_usec << "} "
+      std::cout
+       << "{" << utils::time::time_s(t->when) << "} "
+       << "RMC "
        << t->latitude.first << ' '
-       << t->latitude.second 
+       << t->latitude.second
+       << ","
+       << t->longitude.first << ' '
+       << t->longitude.second
+       << std::endl;
+     }
+
+    if (typeid(*data)==typeid(gps::gps_data_overall_satellite_info))
+     {
+      gps::gps_data_overall_satellite_info * t
+       = (gps::gps_data_overall_satellite_info*)data;
+
+
+      std::cout
+       << "{" << utils::time::time_s(t->when) << "} "
+       << "GSA "
+       << (t->automatic_selection ? "A":"M")
+       << "dop=" << t->dilution_of_precision
+       << " hdop=" << t->horizontal_dilution_of_precision
+       << " vdop=" << t->vertical_dilution_of_precision
+       << " satellites=";
+       for (int s : t->satellites)
+        std::cout << " " << s;
+       std::cout << std::endl;
+     }
+
+    if (typeid(*data)==typeid(gps::gps_data_fix))
+     {
+      gps::gps_data_fix * t= (gps::gps_data_fix*)data;
+      std::cout
+       << "{ " << utils::time::time_s(t->when) << "} "
+       << "GGA "
+       << t->latitude.first << ' '
+       << t->latitude.second
        << ","
        << t->longitude.first << ' '
        << t->longitude.second

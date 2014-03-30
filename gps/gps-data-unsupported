@@ -1,0 +1,19 @@
+#ifndef __MODULE_GPS_DATA_UNSUPPORTED__
+#define __MODULE_GPS_DATA_UNSUPPORTED__
+
+
+//////////////////////////////
+class gps_data_unsupported : public gps_data
+ {
+ public:
+  const std::string sentence;
+
+  gps_data_unsupported(const std::string & sentence_)
+   : sentence(sentence_)
+  {}
+
+  virtual ~gps_data_unsupported(){}
+ };
+
+#endif
+ // __MODULE_GPS_DATA_UNSUPPORTED__

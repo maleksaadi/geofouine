@@ -1,0 +1,38 @@
+#ifndef __MODULE_GPS_DATA_FIX__
+#define __MODULE_GPS_DATA_FIX__
+
+
+//////////////////////////////
+//
+// a.k.a. General satellite information
+//
+class gps_data_fix : public gps_data
+ {
+ public:
+  
+  struct timeval when;
+  std::pair<float,char> latitude,longitude;
+  int fix_quality;
+  int nb_satellites_tracked;
+  float horizontal_dilution_of_precision,
+        altitude,
+        geoid_altitude;
+
+
+  gps_data_fix(const std::string & sentence)
+   {
+    std::vector<std::string> pieces;
+    boost::algorithm::split(pieces,sentence,boost::algorithm::is_any_of(",*"));
+    
+    when=gps::gps_time(gps::gps_utc_date_s(utils::ts::now()),pieces[1]);
+
+    latitude=std::pair<float,char>(std::stof(pieces[2]),pieces[3][0]);
+    longitude=std::pair<float,char>(std::stof(pieces[4]),pieces[5][0]);
+
+   }
+
+  virtual ~gps_data_fix() {}
+ };
+
+#endif
+ // __MODULE_GPS_DATA_FIX__

@@ -2,14 +2,21 @@
 #define __MODULE__UTILS__
 
 #include <stdint.h>
+#include <sys/time.h>
 #include <string>
 
 namespace utils
 {
  namespace ts
   {
-   uint64_t now();
-   std::string now_s();
+   struct timeval now();
+  }
+
+ namespace time
+  {
+   std::string time_s(const struct timeval & tv); // in current tz
+   std::string utc_time_s(const struct timeval & tv); // in UTC
+   std::string utc_date_s(const struct timeval & tv);
   }
 
 } // namespace utils

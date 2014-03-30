@@ -4,11 +4,16 @@
 #include <string>
 #include <gps/gps-data>
 
+namespace gps {
+
 class gps_stream_decoder
  {
   public:
+
   static gps::gps_data * decode(const std::string & gps_sentence);
  };
+
+} // namespace gps
 
 #endif
   // __MODULE_GPS_STREAM_DECODER__

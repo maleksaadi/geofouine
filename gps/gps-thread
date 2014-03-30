@@ -32,7 +32,7 @@ class gps_worker
        {
         std::cout << "yay?" << std::endl;
         //if(data->fix.mode>=2)
-        out << utils::ts::now_s()
+        out << utils::time::time_s(utils::ts::now())
             << data->status
             << data->satellites_used
             << data->satellites_visible

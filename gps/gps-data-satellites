@@ -1,0 +1,16 @@
+#ifndef __MODULE_GPS_SATELLITES__
+#define __MODULE_GPS_SATELLITES__
+
+//////////////////////////////
+class gps_data_satellites : public gps_data
+ {
+ public:
+
+  gps_data_satellites(const std::string & sentence)
+  {}
+
+  virtual ~gps_data_satellites() {}
+ };
+
+#endif
+ // __MODULE_GPS_SATELLITES__

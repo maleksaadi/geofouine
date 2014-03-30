@@ -2,6 +2,7 @@
 #include <string>
 
 #include <stddef.h>
+#include <utils/utils>
 #include <iostream>
 
 namespace gps {
@@ -10,20 +11,35 @@ namespace gps {
   {
    timeval tv;
    struct tm tm;
-   //std::cout << date+timeofday << std::endl;
+
    std::string t=date+time_of_day;
    for (int i=1;i<=5;i++) t.insert(3*i-1,":");
-   std::cout << "t=" << t << std::endl;
    
    strptime(t.c_str(),"%d:%m:%y:%H:%M:%S",&tm);
 
    tv.tv_sec=mktime(&tm);
    size_t i=time_of_day.find('.');
    if (i!=std::string::npos)
-    tv.tv_usec=std::stof(time_of_day.substr(i))*1000;
+    tv.tv_usec=std::stof(time_of_day.substr(i))*1000000;
    else
     tv.tv_usec=0;
+
    return tv;
   }
+
+ std::string gps_utc_date_s(const struct timeval & tv)
+  {
+   const size_t buffer_size=50;
+   char buffer[buffer_size];
+
+   strftime (buffer,
+             buffer_size,
+             "%d%m%Y", 
+             gmtime(&tv.tv_sec)
+             );
+
+   return std::string(buffer);
+  }
+ 
 
 } // namespace gps

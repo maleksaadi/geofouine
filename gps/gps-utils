@@ -1,11 +1,15 @@
 #ifndef __MODULE_GPS_UTILS__
 #define __MODULE_GPS_UTILS__
 
+#include <sys/time.h>
 #include <string>
 
 namespace gps {
 
  struct timeval gps_time( const std::string & date, const std::string & timeofday );
+
+ std::string gps_utc_date_s(const struct timeval & tv);
+ 
 
 } // namespace gps
 

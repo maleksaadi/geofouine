@@ -1,0 +1,47 @@
+#ifndef __MODULE_GPS_OVERALL__
+#define __MODULE_GPS_OVERALL__
+
+
+//////////////////////////////
+//
+// a.k.a. General satellite information
+//
+class gps_data_overall_satellite_info : public gps_data
+ {
+ public:
+
+   struct timeval when;
+   bool automatic_selection;
+   int fix_mode; // 1=no fix, 2=2D fix, 3=3D fix
+   float dilution_of_precision;
+   float horizontal_dilution_of_precision;
+   float vertical_dilution_of_precision;
+   std::vector<int> satellites;
+
+
+  gps_data_overall_satellite_info(const std::string & sentence)
+   {
+    std::vector<std::string> pieces;
+    boost::algorithm::split(pieces,sentence,boost::algorithm::is_any_of(",*"));
+    size_t last=pieces.size()-1;
+
+    when=utils::ts::now();
+
+    automatic_selection=(pieces[1]=="A");
+    fix_mode=std::stoi(pieces[2]);
+
+    for (size_t i=3;i<last-3;i++) // should be 12?
+     if (pieces[i]!="")
+      satellites.push_back(std::stoi(pieces[i]));
+      
+
+    dilution_of_precision=std::stof(pieces[last-3]);
+    horizontal_dilution_of_precision=std::stof(pieces[last-2]);
+    vertical_dilution_of_precision=std::stof(pieces[last-1]);
+   }
+
+  virtual ~gps_data_overall_satellite_info() {}
+ };
+
+#endif
+ // __MODULE_GPS_OVERALL__
