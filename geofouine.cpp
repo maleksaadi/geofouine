@@ -402,6 +402,7 @@ int main()
        << ","
        << t->longitude.first << ' '
        << t->longitude.second
+       << " speed=" << t->speed
        << std::endl;
      }
 
@@ -418,10 +419,10 @@ int main()
        << "dop=" << t->dilution_of_precision
        << " hdop=" << t->horizontal_dilution_of_precision
        << " vdop=" << t->vertical_dilution_of_precision
-       << " satellites=";
+       << " satellites= [";
        for (int s : t->satellites)
         std::cout << " " << s;
-       std::cout << std::endl;
+       std::cout << " ]" << std::endl;
      }
 
     if (typeid(*data)==typeid(gps::gps_data_fix))
@@ -451,7 +452,7 @@ int main()
        << "GSV "
        << t->part_nb << "/" << t->nb_parts
        << " nb=" << t->nb_satellites
-       << "\t";
+       << "\t [";
       for(auto x : t->satellites)
        std::cout 
         << " [" << x.prn 
@@ -459,7 +460,7 @@ int main()
         << "," << x.azimuth 
         << "," << x.snr 
         << "]";
-      std::cout << std::endl;
+      std::cout << " ]" << std::endl;
       
      }
 

@@ -30,13 +30,11 @@ class gps_data_fix : public gps_data
     latitude=std::pair<float,char>(std::stof(pieces[2]),pieces[3][0]);
     longitude=std::pair<float,char>(std::stof(pieces[4]),pieces[5][0]);
     fix_quality=std::stoi(pieces[6]);
-    nb_satellites_tracked=std::stoi(pieces[7]);
-    horizontal_dilution_of_precision=std::stof(pieces[8]);
-    altitude=std::stof(pieces[9]);
-    if (pieces[11]!="")
-     geoid_altitude=std::stof(pieces[11]);
-    else
-     geoid_altitude=0;
+    nb_satellites_tracked=utils::convert::with_default<int>(pieces[7],0);
+    horizontal_dilution_of_precision=utils::convert::with_default<float>(pieces[8],0);
+    altitude=utils::convert::with_default<float>(pieces[9],0);
+    geoid_altitude=utils::convert::with_default<float>(pieces[11],0);
+
    }
 
   virtual ~gps_data_fix() {}

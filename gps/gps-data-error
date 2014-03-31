@@ -1,0 +1,19 @@
+#ifndef __MODULE_GPS_DATA_ERROR__
+#define __MODULE_GPS_DATA_ERROR__
+
+
+//////////////////////////////
+class gps_data_error : public gps_data
+ {
+ public:
+  const std::string sentence;
+
+  gps_data_error(const std::string & sentence_)
+   : sentence(sentence_)
+  {}
+
+  virtual ~gps_data_error(){}
+ };
+
+#endif
+ // __MODULE_GPS_DATA_ERROR__
