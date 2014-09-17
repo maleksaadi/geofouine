@@ -6,7 +6,7 @@
 // Description : Read GPS and Wireless information from drivers write it on a file.
 // Depends on  : libiw-dev, libgps-dev
 //============================================================================
-
+{
 #include <time.h>
 #include <iostream>
 #include <iomanip>
@@ -17,11 +17,14 @@
 #include <fstream>
 #include <limits>
 #include<sstream>
+#include <list>
+#include <algorithm>
 
 #include <gps/gps-stream>
 #include <gps/gps-stream-decoder>
 #include <gps/gps-data>
 #include <gps/gps-thread>
+
 
 using namespace std;
 
@@ -63,7 +66,7 @@ int n = sizeof(freq)/sizeof(freq[0]);
     return ss.str();
 
 }
-
+}
 void* start_GPS_Scan(void*)
 {
     gpsmm gps_rec("localhost", DEFAULT_GPSD_PORT);
@@ -134,19 +137,24 @@ void* start_GPS_Scan(void*)
 
 
 
-void* start_WiFi_Scan(void*)
-{
 
-    wireless_scan_head context;
+
+
+
+            public class Wifi
+{
+    void Wifi 
+	{
+	    wireless_scan_head context;
     iw_range range;
 
     //Préparons le fichier csv.
-    std::ofstream csv;
+    std::ofstream c0sv;
     csv.open ("WiFiData.csv",std::ofstream::trunc);
     csv <<
     "\"time\",\"time_incert\", \"protocol_name\", \"network_id\", \"freq\", \"freq_flags\", \"Encoding_key\", \"key_size\", \"key_flags\", \"essid_on\", \"essid_name\", \"essid_len\", \"oper_mode\","<<
     " \"device_dependant_status\", \"link_quality_qual\", \"link_quality_level\", \"link_quality_noise\", \"link_quality_updated\", \"packet_discard_counts_nwid\", \"packet_discard_counts_code\", \"packet_discard_counts_fragment\", \"packet_discard_counts_retries\", \"packet_discard_counts_misc\", \"packet_missed_counts_beacon\""<<endl;
-    csv.close();
+    //csv.close();
 
 
     csv.open ("WiFiRange.csv",std::ofstream::trunc);
@@ -164,17 +172,10 @@ void* start_WiFi_Scan(void*)
 
 
     csv <<endl;
-    csv.close();
+   // csv.close();
 
-
-    for (;;)
-    {
-
-
-
-
-        //2 - scannons les données wifi.
-        int skfd;
+           //2 - scannons les données wifi.
+      public int skfd;
         skfd = iw_sockets_open();
 
         char* interface = new char[5];
@@ -184,16 +185,7 @@ void* start_WiFi_Scan(void*)
         int now = (int)timestamp;
         int retScan = iw_scan(skfd, interface, WIRELESS_EXT, &context);
         int retRange = iw_get_range_info(skfd, interface, &range);
-        iw_sockets_close(skfd);
-
-        if (retScan >= 0)
-        {
-            while (context.result)
-            {
-
-
-
-//time, time_incert, protocol_name, network_id, freq, freq_flags, Encoding_key, key_size, key_flags, essid_on, essid_name, essid_len, oper_mode,
+		//time, time_incert, protocol_name, network_id, freq, freq_flags, Encoding_key, key_size, key_flags, essid_on, essid_name, essid_len, oper_mode,
 //device_dependant_status, link_quality_qual, link_quality_level, link_quality_noise, link_quality_updated, packet_discard_counts_nwid, packet_discard_counts_code, packet_discard_counts_fragment, packet_discard_counts_retries, packet_discard_counts_misc, packet_missed_counts_beacon,
 
 
@@ -204,70 +196,95 @@ void* start_WiFi_Scan(void*)
                 csv_add(now   );  //time
                 csv_add(""  );  //time_incert
                 csv_add(wi_config.name   );  //protocol_name
-                if(wi_config.has_nwid)
-                {
-                    csv_add((int)wi_config.nwid.value );  //network_id
+				 iw_sockets_close(skfd);
+	
+	}
+}
+
+
+  public  class wi_config.has_nwid : wifi
+   {  
+      void Wi_config.has_nwid 
+	  {  
+	       csv_add((int)wi_config.nwid.value );  //network_id
 
                     cout << "network id : " << (int)wi_config.nwid.value << endl;
-                }
-                else csv_na;
-
-                if(wi_config.has_freq)
-                {
+					 csv<<endl;
+                csv.close();
+                context.result = context.result->next;
+	  }
+   }
+  
+   public class wi_config.has_freq : wifi 
+	{
+	   void Vi_config.has_freq
+	    {  
+		   
                     csv_add(wi_config.freq   );  //freq
                     csv_add(wi_config.freq_flags   );  //freq_flags
-                }
-                else
-                {
-                    csv_na;
-                    csv_na;
-                }
-                if(wi_config.has_key)
-                {
-                    csv_add(wi_config.key   );  //Encoding_key
+					 csv<<endl;
+                csv.close();
+                context.result = context.result->next;
+		}
+	}
+	
+	public class wi_config.has_key : wifi 
+	{
+	    void Wi_config.has_key 
+		{
+		    csv_add(wi_config.key   );  //Encoding_key
                     csv_add(wi_config.key_size   );  //key_size
                     csv_add(wi_config.key_flags   );  //key_flags
-                }
-                else
+					 csv<<endl;
+                csv.close();
+                context.result = context.result->next;
+		}
+	}
+  
+         public  class wi_config.has_essid : wifi
+		  {
+		         void Wi_config.has_essid 
+				 {
+				       csv_add((wi_config.essid_on?"ON":"OFF")  );  //essid_on
+					    csv<<endl;
+                csv.close();
+                context.result = context.result->next;
+				 }
+		  }
+		  
+		 public class wi_config.has_essid && wi_config.essid_on: wifi 
                 {
-                    csv_na;
-                    csv_na;
-                    csv_na;
-                }
-                if(wi_config.has_essid)
-                {
-                    csv_add((wi_config.essid_on?"ON":"OFF")  );  //essid_on
-                }
-                else
-                    csv_na;
-
-                if(wi_config.has_essid && wi_config.essid_on)
-                {
-
+                          void Wi_config.has_essid && wi_config.essid_on 
+						  {
                     csv_add(wi_config.essid   );  //essid_name
                     csv_add(wi_config.essid_len   );  //essid_len
 
                     cout << "essid : " << wi_config.essid << endl;
+					 csv<<endl;
+                csv.close();
+                context.result = context.result->next;
+					       }
                 }
-                else
+				
+				
+				public class  wi_config.has_mode : wifi 
+				{
+                             void Wi_config.has_mode
                 {
-                    csv_na;
-                    csv_na;
-                }
-
-                if(wi_config.has_mode)
-                {
-                    csv_add(wi_config.mode   );  //oper_mode,
-
-                }
-                else
-                {
-                    csv_na;
-                }
-
-
-                if(context.result->has_stats)
-                {
+                    csv_add(wi_config.mode   );  //oper_mode,{
+                
+				csv_add(wi_config.mode   );  //oper_mode,
+				 csv<<endl;
+                csv.close();
+                context.result = context.result->next;
+				}
+				}
+    
+	
+	     public class (context.result->has_stats) : wifi {
+                
+				void Context.result->has_stats
+				{
 
                     csv_add( (int)wi_stats.status  );  //device_dependant_status
                     csv_add( (int)wi_stats.qual.qual  );  //link_quality_qual
@@ -282,23 +299,12 @@ void* start_WiFi_Scan(void*)
                     csv_add_final( (int)wi_stats.miss.beacon  );  //packet_missed_counts_beacon
 
 
-                         }
-                         else
-                {
-                    csv  << "\"\" , \"\" , \"\" , \"\" , \"\" , \"\" , \"\" , \"\" , \"\" , \"\" , \"\"";  //link_quality_qual
-
-                }
-                csv<<endl;
-                csv.close();
-                context.result = context.result->next;
-            }
-
-
-        }
-
-
-        if (retRange >= 0)
+                         }}
+	
+	  public  class retRange : wifi
         {
+		
+		    void RetRange {
 
             csv.open ("WiFiRange.csv",std::ofstream::app);
 
@@ -355,16 +361,10 @@ void* start_WiFi_Scan(void*)
             csv_add((int)range.modul_capa  );//range_modul_capa
             csv_add_final((int)range.bitrate_capa  ) << endl;//range_bitrate_capa
             csv.close();
-
         }
-
-
-
-        //sleep(1);
-
-    }
-    pthread_exit(NULL);
-}
+		}
+	
+}}
 
 
 
@@ -470,6 +470,118 @@ int main()
   delete this_gps_stream;
 
   return 0;
+  
+  
+  for (;;)
+    {
+
+
+
+
+
+       
+
+        if (retScan >= 0)
+        {
+            while (context.result)
+            {
+
+
+
+
+                if(wi_config.has_nwid)
+                {
+                     Wi_config.has_nwid ();
+					 
+                }
+                else csv_na;
+
+                if(wi_config.has_freq)
+                {
+                    Wi_config.has_freq ();
+                }
+                else
+                {
+                    csv_na;
+                    csv_na;
+                }
+                if(wi_config.has_key)
+                {
+                    Wi_config.has_key();
+                }
+                else
+                {
+                    csv_na;
+                    csv_na;
+                    csv_na;
+                }
+                if(wi_config.has_essid)
+                {
+                   Wi_config.has_essid ();
+                }
+                else
+                    csv_na;
+
+                if(wi_config.has_essid && wi_config.essid_on)
+                {
+
+                   Wi_config.has_essid && wi_config.essid_on ();
+                }
+                else
+                {
+                    csv_na;
+                    csv_na;
+                }
+
+                if(wi_config.has_mode)
+                {
+                  
+                       Wi_config.has_mode
+                }
+                else
+                {
+                    csv_na;
+                }
+
+
+                if(context.result->has_stats)
+                {
+
+                    Context.result->has_stats ();
+
+                         }
+                         else
+                {
+                    csv  << "\"\" , \"\" , \"\" , \"\" , \"\" , \"\" , \"\" , \"\" , \"\" , \"\" , \"\"";  //link_quality_qual
+
+                }
+               
+            }
+
+
+        }
+
+
+        if (retRange >= 0)
+        {
+
+          RetRange();
+        }
+
+
+
+      
+
+    }
+    pthread_exit(NULL);
+  
+  
+  
+  
+  
+  
+  
+  
  /*
     pthread_t thread_GPS;
     pthread_t thread_WiFi;
