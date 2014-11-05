@@ -10,7 +10,6 @@
 #include <time.h>
 #include <iostream>
 #include <iomanip>
-#include <libgpsmm.h>
 #include <sys/socket.h>
 #include <iwlib.h>
 #include <pthread.h>
