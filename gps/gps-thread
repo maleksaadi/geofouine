@@ -12,7 +12,7 @@ class gps_worker
 
    volatile bool spin;
    csv::csv_ostream out;
-   gpsmm gps;
+  //gpsmm gps;
 
  public:
 
@@ -20,6 +20,7 @@ class gps_worker
 
   void run()
    {
+    /*
     spin=true;
     while (spin)
      {
@@ -59,17 +60,18 @@ class gps_worker
        throw std::runtime_error("gpsd read error");
 
      }
+    */
    }
 
   gps_worker(std::ostream & output_file)
    : spin(false),
-     out(output_file),
-     gps("localhost", DEFAULT_GPSD_PORT)
+     out(output_file)
+     //gps("localhost", DEFAULT_GPSD_PORT)
   {
    // WATCH_ENABLE enables stream reading
    // WATCH_NMEA exports data in NMEA mode
-   if (gps.stream(WATCH_ENABLE | WATCH_NMEA) == 0)
-    throw std::runtime_error("gpsd not found?");
+   //if (gps.stream(WATCH_ENABLE | WATCH_NMEA) == 0)
+   // throw std::runtime_error("gpsd not found?");
   }
  };
 
