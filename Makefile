@@ -21,7 +21,6 @@ LFLAGS = -L/usr/lib/
 LIBS  = -lboost_program_options \
 	-lboost_system \
 	-lcrypto \
-	-lgps \
 	-liw
 
 # __DIRE__ can be specified to trigger
