@@ -65,6 +65,7 @@ int n = sizeof(freq)/sizeof(freq[0]);
 
 void* start_GPS_Scan(void*)
 {
+  /*
     gpsmm gps_rec("localhost", DEFAULT_GPSD_PORT);
 
     if (gps_rec.stream(WATCH_ENABLE | WATCH_JSON) == NULL)
@@ -102,7 +103,7 @@ void* start_GPS_Scan(void*)
                 csv.precision(dbl::digits10);
                 //Time TimeIncert	Latitude LatUncert	Longitude LongUncert	Altitude AltUncert	Course CourseUncert GroundSpeed GroundSpeedUncert	ClimbSpeed	ClimbSpeedIncert
 
-                csv_add(newdata->fix.time );			/* Time */
+                csv_add(newdata->fix.time );			*//* Time */
                 csv_add(newdata->fix.ept );		/* Expected time uncertainty */
                 csv_add(newdata->fix.latitude );	/* Latitude in degrees (valid if mode >= 2) */
                 csv_add(newdata->fix.epy );     /* Latitude position uncertainty, meters */
@@ -115,7 +116,7 @@ void* start_GPS_Scan(void*)
                 csv_add(newdata->fix.speed );	/* Speed over ground, meters/sec */
                 csv_add(newdata->fix.eps );		/* Speed uncertainty, meters/sec */
                 csv_add(newdata->fix.climb );       /* Vertical speed, meters/sec */
-                csv_add_final(newdata->fix.epc ) << endl;		/* Vertical speed uncertainty */
+                csv_add_final(newdata->fix.epc ) << endl;		/* Vertical speed uncertainty *//*
                 cout << newdata->fix.latitude<<", "<< newdata->fix.longitude<<endl;
 
 
@@ -128,6 +129,7 @@ void* start_GPS_Scan(void*)
 
 
     pthread_exit(NULL);
+    */
 }
 
 
@@ -452,14 +454,14 @@ int main()
        << " nb=" << t->nb_satellites
        << "\t";
       for(auto x : t->satellites)
-       std::cout 
-        << " [" << x.prn 
-        << "," << x.elevation 
-        << "," << x.azimuth 
-        << "," << x.snr 
+       std::cout
+        << " [" << x.prn
+        << "," << x.elevation
+        << "," << x.azimuth
+        << "," << x.snr
         << "]";
       std::cout << std::endl;
-      
+
      }
 
     delete data;
