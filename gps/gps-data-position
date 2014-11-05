@@ -18,15 +18,16 @@ class gps_data_position : public gps_data
    std::vector<std::string> pieces;
    boost::algorithm::split(pieces,sentence,boost::algorithm::is_any_of(",*"));
 
-   when=gps::gps_time(pieces[9],pieces[1]);
    active=(pieces[2]=="A");
    latitude=std::pair<float,char>(std::stof(pieces[3]),pieces[4][0]);
    longitude=std::pair<float,char>(std::stof(pieces[5]),pieces[6][0]);
-   speed=utils::convert::with_default<float>(pieces[7],0);
-   bearing=utils::convert::with_default<float>(pieces[8],0);
-   variation=(pieces[10]=="") ? 
-    std::pair<float,char>(0,0) :
-    std::pair<float,char>(std::stof(pieces[10]),pieces[11][0]);
+   speed=pieces[6]!="" ? std::stof(pieces[7]):-1;
+   bearing=pieces[7]!="" ? std::stof(pieces[8]):-1;
+   when=gps::gps_time(pieces[9],pieces[1]);
+   if (pieces[10]!="")
+    variation=std::pair<float,char>(std::stof(pieces[10]),pieces[11][0]);
+   else
+    variation=std::pair<float,char>(0,0);
   }
 
   virtual ~gps_data_position() {}

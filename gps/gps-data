@@ -25,7 +25,6 @@ class gps_data
 #include <gps/gps-data-fix>
 #include <gps/gps-data-satellites>
 #include <gps/gps-data-unsupported>
-#include <gps/gps-data-error>
 
 } // namespace GPS
 

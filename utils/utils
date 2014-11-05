@@ -4,24 +4,9 @@
 #include <stdint.h>
 #include <sys/time.h>
 #include <string>
-#include <stdexcept>
 
 namespace utils
 {
- namespace convert
-  {
-   template <typename T> inline T with_default(const std::string &, const T & default_value)
-   { throw std::runtime_error(__PRETTY_FUNCTION__+" not implemented"); }
-
-   template <> inline int with_default(const std::string & s, const int & default_value)
-   { return (s=="") ? default_value : std::stoi(s); }
-
-   template <> inline float with_default(const std::string & s, const float & default_value)
-   { return (s=="") ? default_value : std::stof(s); }
-
-
-   } // namespace convert
-
  namespace ts
   {
    struct timeval now();

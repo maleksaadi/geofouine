@@ -24,21 +24,20 @@ class gps_data_satellites : public gps_data
     
     when=utils::ts::now();
     nb_parts=std::stoi(pieces[1]);
-    part_nb=utils::convert::with_default<int>(pieces[2],0);
-    nb_satellites=utils::convert::with_default<int>(pieces[3],0);
+    part_nb=std::stoi(pieces[2]);
+    nb_satellites=std::stoi(pieces[3]); // for this *group* of messages
     
     int sat=pieces.size()-4-1; // -4 = first 4 ones, -1 = last one is checksum
-    if (nb_satellites)
-     for (int i=0,b=4;i<sat/4;i++,b+=4)
-      {
-       satellite_info t=
-        { utils::convert::with_default<int>(pieces[b+0],0), // prn
-          utils::convert::with_default<int>(pieces[b+1],0), // elevation
-          utils::convert::with_default<int>(pieces[b+2],0), // azimuth
-          utils::convert::with_default<int>(pieces[b+3],0)  // psnr
-        };
-       satellites.push_back(t);
-      }
+    for (int i=0;i<sat/4;i++)
+     {
+      satellite_info t=
+       { pieces[4+i*4+0]=="" ? 0 : std::stoi(pieces[4+i*4+0]), // prn
+         pieces[4+i*4+1]=="" ? 0 : std::stoi(pieces[4+i*4+1]), // elevation
+         pieces[4+i*4+2]=="" ? 0 : std::stoi(pieces[4+i*4+2]), // azimuth
+         pieces[4+i*4+3]=="" ? 0 : std::stoi(pieces[4+i*4+3]) // psnr
+       };
+      satellites.push_back(t);
+     }
    }
 
   virtual ~gps_data_satellites() {}

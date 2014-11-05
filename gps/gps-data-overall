@@ -34,13 +34,10 @@ class gps_data_overall_satellite_info : public gps_data
      if (pieces[i]!="")
       satellites.push_back(std::stoi(pieces[i]));
       
-    // if no satellites are found (for e.g.,
-    // you live in a cave or have your office
-    // in the K wing of UQAR), the list may be void,
-    // and these might not be present.
-    dilution_of_precision=utils::convert::with_default<float>(pieces[last-3],0);
-    horizontal_dilution_of_precision=utils::convert::with_default<float>(pieces[last-2],0);
-    vertical_dilution_of_precision=utils::convert::with_default<float>(pieces[last-1],0);
+
+    dilution_of_precision=std::stof(pieces[last-3]);
+    horizontal_dilution_of_precision=std::stof(pieces[last-2]);
+    vertical_dilution_of_precision=std::stof(pieces[last-1]);
    }
 
   virtual ~gps_data_overall_satellite_info() {}
