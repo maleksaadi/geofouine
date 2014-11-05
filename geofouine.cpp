@@ -1,6 +1,6 @@
 //============================================================================
 // Name        : main.cpp
-// Author      : UQAR, Thierry Giroux Veilleux,Saadi Abdelmalek
+// Author      : UQAR, Thierry Giroux Veilleux
 // Version     :
 // Copyright   :
 // Description : Read GPS and Wireless information from drivers write it on a file.
@@ -149,7 +149,7 @@ void* start_GPS_Scan(void*)
     iw_range range;
 
     //Préparons le fichier csv.
-    std::ofstream csv;
+    std::ofstream c0sv;
     csv.open ("WiFiData.csv",std::ofstream::trunc);
     csv <<
     "\"time\",\"time_incert\", \"protocol_name\", \"network_id\", \"freq\", \"freq_flags\", \"Encoding_key\", \"key_size\", \"key_flags\", \"essid_on\", \"essid_name\", \"essid_len\", \"oper_mode\","<<
