@@ -65,71 +65,7 @@ int n = sizeof(freq)/sizeof(freq[0]);
 
 void* start_GPS_Scan(void*)
 {
-  /*
-    gpsmm gps_rec("localhost", DEFAULT_GPSD_PORT);
-
-    if (gps_rec.stream(WATCH_ENABLE | WATCH_JSON) == NULL)
-    {
-        cerr << "Démarrez GPSD!!!\n";
-        pthread_exit(NULL);
-    }
-    //Préparons le fichier csv.
-    std::ofstream csv;
-    csv.open ("GPSdata.csv",std::ofstream::trunc);
-    csv <<
-    "\"time\",\"time_incert\",\"latitude\",\"lat_uncert\",\"longitude\",\"long_uncert\","<<
-    "\"altitude\",\"alt_uncert\",\"course\",\"course_uncert\",\"ground_speed\",\"ground_speed_uncert\",\"climb_speed\",\"climb_speed_incert\""<<endl;
-    csv.close();
-    for (;;)
-    {
-        //1 - obtenons la donnée gps.
-
-        struct gps_data_t* newdata;
-
-        if (!gps_rec.waiting(50000000))
-            continue;
-
-        if ((newdata = gps_rec.read()) == NULL)
-        {
-            cerr << "Erreur de lecture.\n";
-            pthread_exit(NULL);
-        }
-        else
-        {
-
-            if(newdata->fix.mode>=2)
-            {
-                csv.open ("GPSdata.csv",std::ofstream::app);
-                csv.precision(dbl::digits10);
-                //Time TimeIncert	Latitude LatUncert	Longitude LongUncert	Altitude AltUncert	Course CourseUncert GroundSpeed GroundSpeedUncert	ClimbSpeed	ClimbSpeedIncert
-
-                csv_add(newdata->fix.time );			*//* Time */
-                csv_add(newdata->fix.ept );		/* Expected time uncertainty */
-                csv_add(newdata->fix.latitude );	/* Latitude in degrees (valid if mode >= 2) */
-                csv_add(newdata->fix.epy );     /* Latitude position uncertainty, meters */
-                csv_add(newdata->fix.longitude );	/* Longitude in degrees (valid if mode >= 2) */
-                csv_add(newdata->fix.epx );     /* Longitude position uncertainty, meters */
-                csv_add(newdata->fix.altitude );	/* Altitude in meters (valid if mode == 3) */
-                csv_add(newdata->fix.epv );     /* Vertical position uncertainty, meters */
-                csv_add(newdata->fix.track );	/* Course made good (relative to true north) */
-                csv_add(newdata->fix.epd );		/* Track uncertainty, degrees */
-                csv_add(newdata->fix.speed );	/* Speed over ground, meters/sec */
-                csv_add(newdata->fix.eps );		/* Speed uncertainty, meters/sec */
-                csv_add(newdata->fix.climb );       /* Vertical speed, meters/sec */
-                csv_add_final(newdata->fix.epc ) << endl;		/* Vertical speed uncertainty *//*
-                cout << newdata->fix.latitude<<", "<< newdata->fix.longitude<<endl;
-
-
-                csv.close();
-            }
-        }
-
-
-    }
-
-
-    pthread_exit(NULL);
-    */
+    
 }
 
 
