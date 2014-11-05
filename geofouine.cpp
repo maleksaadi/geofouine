@@ -1,7 +1,7 @@
 //============================================================================
 // Name        : main.cpp
 // Author      : UQAR, Thierry Giroux Veilleux
-// Version     :
+// Version     
 // Copyright   :
 // Description : Read GPS and Wireless information from drivers write it on a file.
 // Depends on  : libiw-dev, libgps-dev
