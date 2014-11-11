@@ -310,7 +310,7 @@ int main()
  //gps_worker * this_worker = new gps_worker(std::cout);
 
  //this_worker->run();
-  gps::gps_stream * this_gps_stream = new gps::gps_stream("/dev/ttyACM0");
+  gps::gps_stream * this_gps_stream = new gps::gps_stream("/dev/ttyUSB0");
 
   this_gps_stream->set_update_rate(gps::gps_stream::update_250ms);
   while (true)
