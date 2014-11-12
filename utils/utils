@@ -5,22 +5,16 @@
 #include <sys/time.h>
 #include <string>
 
-namespace utils
-{
- namespace ts
-  {
-   struct timeval now();
+namespace utils {
+  namespace ts {
+    struct timeval now();
   }
-
- namespace time
-  {
-   std::string time_s(const struct timeval & tv); // in current tz
-   std::string utc_time_s(const struct timeval & tv); // in UTC
-   std::string utc_date_s(const struct timeval & tv);
+  
+  namespace time {
+    std::string time_s(const struct timeval & tv); // in current tz
+    std::string utc_time_s(const struct timeval & tv); // in UTC
+    std::string utc_date_s(const struct timeval & tv);
   }
-
 } // namespace utils
 
-
-#endif
- // __MODULE_UTILS__
+#endif // __MODULE_UTILS__
