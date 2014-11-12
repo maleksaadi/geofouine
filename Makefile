@@ -10,9 +10,9 @@ OBJS		=	$(SRCS:.cpp=.o)
 CXXFLAGS	=	-O3 		\
 			-std=c++11 	\
 			-W		\
-			-Wall 		\
+			-Wall		\
+			-Wextra		\
 			-Werror		\
-			-Wextra 	\
 			-fopenmp	\
 			-I$(CURDIR)	\
 			-I/usr/include/boost/
@@ -23,7 +23,6 @@ LDFLAGS 	=	-L/usr/lib/		\
 			-lcrypto 		\
 			-liw			\
 			-lpthread
-
 
 DEFINES		=	-D__PROGNAME__=geofouine \
 			-D__PROGVER__=0.5 \
