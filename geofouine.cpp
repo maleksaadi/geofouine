@@ -63,10 +63,10 @@ int n = sizeof(freq)/sizeof(freq[0]);
 
 }
 
-void* start_GPS_Scan(void*)
-{
-    
-}
+//void* start_GPS_Scan(void*)
+//{
+//    
+//}
 
 
 
