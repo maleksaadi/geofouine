@@ -7,15 +7,10 @@ SRCS	= 	utils/utils.cpp 		\
 
 OBJS	=	$(SRCS:.cpp=.o)
 
-INCL	=	-I. -I /usr/include/boost/
+INCL= -I. -I$(CURDIR) -I/usr/include/boost/
 
-CFLAGS 	= 	-O3 		\
-		-std=c++11 	\
-		-Wall 		\
-		-Wextra 	\
-		-fopenmp
 
-LFLAGS 	= 	-L/usr/lib/
+LDFLAGS 	= 	-L/usr/lib/
 
 LIBS  	= 	-lboost_program_options \
 		-lboost_system 		\
@@ -25,11 +20,19 @@ LIBS  	= 	-lboost_program_options \
 DEFINES	=	-D__PROGNAME__=geofouine \
 		-D__PROGVER__=0.5 \
 
+CXXFLAGS= 	$(INCL) \
+		-O3 		\
+		-std=c++11 	\
+		-Wall 		\
+		-Wextra 	\
+		-fopenmp	\
+		$(LIBS)
 
 all:		$(NAME)
 
 $(NAME):	$(OBJS)
-		g++ $(CFLAGS) $(INCL) $(DEFINES) $(OBJS) $(LFLAGS) $(LIBS) -o $(NAME)
+		g++
+		#g++ $(INCL) $(DEFINES) $(OBJS) $(LDFLAGS) $(LIBS) -o $(NAME)
 
 clean:
 		rm -rfv	$(OBJS)
