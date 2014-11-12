@@ -1,43 +1,43 @@
-NAME    =       geofouine
+NAME	=	geofouine
 
-SRCS    =       utils/utils.cpp                 \
-                gps/gps-utils.cpp               \
-                gps/gps-stream-decoder.cpp      \
-                geofouine.cpp
+SRCS	= 	utils/utils.cpp 		\
+		gps/gps-utils.cpp 		\
+		gps/gps-stream-decoder.cpp 	\
+		geofouine.cpp
 
-OBJS    =       $(SRCS:.cpp=.o)
+OBJS	=	$(SRCS:.cpp=.o)
 
-INCL    =       -I. -I /usr/include/boost/
+INCL	=	-I. -I /usr/include/boost/
 
-CXXFLAGS=       -O3             \
-                -std=c++11      \
-                -Wall           \
-                -Wextra         \
-                -fopenmp
+CFLAGS 	= 	-O3 		\
+		-std=c++11 	\
+		-Wall 		\
+		-Wextra 	\
+		-fopenmp
 
-LFLAGS  =       -L/usr/lib/
+LFLAGS 	= 	-L/usr/lib/
 
-LIBS    =       -lboost_program_options \
-                -lboost_system          \
-                -lcrypto                \
-                -liw
+LIBS  	= 	-lboost_program_options \
+		-lboost_system 		\
+		-lcrypto 		\
+		-liw
 
-DEFINES =       -D__PROGNAME__=geofouine \
-                -D__PROGVER__=0.5 \
+DEFINES	=	-D__PROGNAME__=geofouine \
+		-D__PROGVER__=0.5 \
 
 
-all:            $(NAME)
+all:		$(NAME)
 
-$(NAME):        $(OBJS)
-                g++ $(INCL) $(DEFINES) $(OBJS) $(LFLAGS) $(LIBS) -o $(NAME)
+$(NAME):	$(OBJS)
+		g++ $(CFLAGS) $(INCL) $(DEFINES) $(OBJS) $(LFLAGS) $(LIBS) -o $(NAME)
 
 clean:
-                rm -rfv $(OBJS)
+		rm -rfv	$(OBJS)
 
-fclean:         clean
-                rm -rfv $(NAME)
+fclean:		clean
+		rm -rfv $(NAME)
 
-re:             fclean all
+re:		fclean all
 
 installcheck:
-        @check-script $(LIBS)
+	@check-script $(LIBS)
