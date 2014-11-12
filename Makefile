@@ -1,48 +1,43 @@
+NAME    =       geofouine
 
-SOURCES = \
-	utils/utils.cpp \
-	gps/gps-utils.cpp \
-	gps/gps-stream-decoder.cpp \
-	geofouine.cpp
+SRCS    =       utils/utils.cpp                 \
+                gps/gps-utils.cpp               \
+                gps/gps-stream-decoder.cpp      \
+                geofouine.cpp
 
-INCLUDES= -I. -I /usr/include/boost/
+OBJS    =       $(SRCS:.cpp=.o)
 
-# add -fshort-enums if __DIRE__
-# (or not, I'm a Makefile, not
-# the police)
-CFLAGS = -O3 \
-	-std=c++11 \
-	-Wall \
-	-Wextra \
-	-fopenmp
+INCL    =       -I. -I /usr/include/boost/
 
-LFLAGS = -L/usr/lib/
+CXXFLAGS=       -O3             \
+                -std=c++11      \
+                -Wall           \
+                -Wextra         \
+                -fopenmp
 
-LIBS  = -lboost_program_options \
-	-lboost_system \
-	-lcrypto \
-	-liw
+LFLAGS  =       -L/usr/lib/
 
-# __DIRE__ can be specified to trigger
-# memory optimizations (but may result
-# in loss of performance) (and may or
-# may not result in any significant
-# memory optimizations) (also specify
-# __48BITS__ with __DIRE__ to enable a
-# specific memory model)
+LIBS    =       -lboost_program_options \
+                -lboost_system          \
+                -lcrypto                \
+                -liw
 
-DEFINES=\
-	-D__PROGNAME__=geofouine \
-	-D__PROGVER__=0.5 \
+DEFINES =       -D__PROGNAME__=geofouine \
+                -D__PROGVER__=0.5 \
 
 
-all:	#$(SOURCES)
-	g++ $(CFLAGS) \
-	$(INCLUDES) $(DEFINES) $(SOURCES) $(LFLAGS) $(LIBS) -o geofouine
+all:            $(NAME)
+
+$(NAME):        $(OBJS)
+                g++ $(INCL) $(DEFINES) $(OBJS) $(LFLAGS) $(LIBS) -o $(NAME)
 
 clean:
-	rm -v *.o
-	rm geofouine
+                rm -rfv $(OBJS)
+
+fclean:         clean
+                rm -rfv $(NAME)
+
+re:             fclean all
 
 installcheck:
-	@check-script $(LIBS)
+        @check-script $(LIBS)
