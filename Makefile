@@ -1,9 +1,10 @@
 NAME		=	geofouine
 
-SRCS		= 	utils/utils.cpp 		\
+SRCS		= 	main.cpp			\
+			utils/utils.cpp 		\
 			gps/gps-utils.cpp 		\
 			gps/gps-stream-decoder.cpp 	\
-			geofouine.cpp
+			Wifi.cpp
 
 OBJS		=	$(SRCS:.cpp=.o)
 
@@ -33,10 +34,10 @@ $(NAME):		$(OBJS)
 			g++ -o $(NAME) $(OBJS) $(DEFINES) $(LDFLAGS)
 
 clean:
-			rm -rfv	$(OBJS)
+			rm -v	$(OBJS)
 
 fclean:			clean
-			rm -rfv $(NAME)
+			rm -v $(NAME)
 
 re:			fclean all
 
