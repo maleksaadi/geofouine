@@ -4,7 +4,8 @@ SRCS		= 	main.cpp			\
 			utils/utils.cpp 		\
 			gps/gps-utils.cpp 		\
 			gps/gps-stream-decoder.cpp 	\
-			Wifi.cpp
+			Wifi.cpp			\
+			Gps.cpp
 
 OBJS		=	$(SRCS:.cpp=.o)
 

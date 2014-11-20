@@ -9,10 +9,15 @@
 
 #include <Wifi.hpp>
 
+void gpsScan(); // temporaire
+
 int main(void) {
+  gpsScan();
+  /*
   Wifi Wifi("wlan0");
   
   while (42)
     Wifi.startScan();
+  */
   return 0;
 }
