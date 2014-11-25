@@ -1,0 +1,51 @@
+using System;
+using System.IO;
+//using System.IO.Ports;
+
+class GPS
+ {
+  private System.IO.Ports.SerialPort gpsDevice;
+
+  public string ReadLine() { return gpsDevice.ReadLine(); }
+
+  public GPS(string gpsDeviceName)
+   {
+    try 
+     {
+      // open device in 4800, 8,n,1, and...
+      gpsDevice=
+       new System.IO.Ports.SerialPort(gpsDeviceName,
+                                      4800,
+                                      System.IO.Ports.Parity.None,
+                                      8,
+                                      System.IO.Ports.StopBits.One);
+
+      // ...set full handshake protocol
+      gpsDevice.Handshake=System.IO.Ports.Handshake.RequestToSendXOnXOff;
+
+      gpsDevice.Open();
+     }
+    catch
+     {
+      // oh noes!!1!
+      System.Console.WriteLine("ach! grosse malheur!");
+     }
+   }
+ }
+
+class WarDrive
+ {
+  // linux version
+  const string gpsDeviceName=@"/dev/ttyUSB0";
+
+  public static void Main()
+   {
+    // create a GPS file stream thingie
+    //
+    GPS gps=new GPS(gpsDeviceName);
+    while (true)
+     {
+      System.Console.WriteLine(gps.ReadLine());
+     }
+   }
+ }
